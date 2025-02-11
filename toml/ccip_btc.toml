@@ -1,0 +1,80 @@
+[FUNGetBtcTokenInfoCCIP]
+dsn = "rune_dns_pro"
+cmd = """
+WITH minted_data AS (
+    SELECT
+        'ethereum_1' AS chain_name,
+        SUM(amount) AS total_minted_amount
+    FROM ethereum_1.event_minted_de71a0
+    UNION ALL
+    SELECT
+        'optimism_10' AS chain_name,
+        SUM(amount) AS total_minted_amount
+    FROM optimism_10.event_minted_f7e8fe
+	UNION ALL
+    SELECT
+        'bsc_56' AS chain_name,
+        SUM(amount) AS total_minted_amount
+    FROM bsc_56.event_minted_30b448
+	UNION ALL
+    SELECT
+        'mantle_5000' AS chain_name,
+        SUM(amount) AS total_minted_amount
+    FROM mantle_5000.event_minted_b0112a
+	UNION ALL
+    SELECT
+        'mode_34443' AS chain_name,
+        SUM(amount) AS total_minted_amount
+    FROM mode_34443.event_minted_85d7bb
+	UNION ALL
+    SELECT
+        'arbitrum_42161' AS chain_name,
+        SUM(amount) AS total_minted_amount
+    FROM arbitrum_42161.event_minted_798638
+),
+burned_data AS (
+    SELECT
+        'ethereum_1' AS chain_name,
+        SUM(amount) AS total_burned_amount
+    FROM ethereum_1.event_burned_de71a0
+    UNION ALL
+    SELECT
+        'optimism_10' AS chain_name,
+        SUM(amount) AS total_burned_amount
+    FROM optimism_10.event_burned_f7e8fe
+	UNION ALL
+    SELECT
+        'bsc_56' AS chain_name,
+        SUM(amount) AS total_burned_amount
+    FROM bsc_56.event_burned_30b448
+	UNION ALL
+    SELECT
+        'mantle_5000' AS chain_name,
+        SUM(amount) AS total_burned_amount
+    FROM mantle_5000.event_burned_b0112a
+	UNION ALL
+    SELECT
+        'mode_34443' AS chain_name,
+        SUM(amount) AS total_burned_amount
+    FROM mode_34443.event_burned_85d7bb
+	UNION ALL
+    SELECT
+        'arbitrum_42161' AS chain_name,
+        SUM(amount) AS total_burned_amount
+    FROM arbitrum_42161.event_burned_798638
+)
+SELECT
+    m.chain_name,
+    COALESCE(m.total_minted_amount, 0) AS total_minted_amount,
+    COALESCE(b.total_burned_amount, 0) AS total_burned_amount,
+    COALESCE(m.total_minted_amount, 0) - COALESCE(b.total_burned_amount, 0) AS total_amount
+FROM
+    minted_data m
+LEFT JOIN
+    burned_data b
+ON
+    m.chain_name = b.chain_name
+ORDER BY
+    chain_name;
+"""
+

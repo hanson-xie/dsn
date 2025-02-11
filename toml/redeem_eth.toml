@@ -1,0 +1,258 @@
+[FuncGetDebtDurationRedeemEthereum]
+dsn = "rune_dns_pro"
+cmd = """
+SELECT
+    SUM(amount) AS total_amount
+FROM
+    ethereum_1.event_delayedredeemcreated_aa732c
+WHERE
+    token = '@token'
+    AND evt_block_time between @time_duration.start_time AND @time_duration.end_time;
+"""
+params = """
+{
+    "token": "0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599",
+    "time_duration" : {
+        "start_time": 1737300894,
+        "end_time": 1737340894
+    }
+}
+"""
+
+[FuncGetRecent8DaysInfoRedeemEthereum]
+dsn = "rune_dns_pro"
+cmd = """
+WITH date_ranges AS (
+    -- Generate 17 days of date ranges, from 8 days before now to 8 days after now
+    SELECT
+        generate_series(
+            DATE_TRUNC('day', now()) - INTERVAL '8 days',
+            DATE_TRUNC('day', now()) + INTERVAL '8 days',
+            INTERVAL '1 day'
+        )::date AS date
+),
+created_data AS (
+    -- Aggregate data from event_delayedredeemcreated_aa732c table
+    SELECT
+        edc.token,
+        dr.date,
+        -- Calculate total_debt
+        COALESCE(SUM(edc.amount) FILTER (WHERE edc.evt_block_time <= EXTRACT(EPOCH FROM dr.date + INTERVAL '1 day')), 0) AS total_debt
+    FROM
+        date_ranges dr
+        CROSS JOIN unnest(ARRAY(
+                              SELECT trim(both '"' FROM elem)
+                              FROM unnest(
+                                  string_to_array(
+                                      REPLACE(REPLACE('@token', '[', ''), ']', ''),
+                                      ', '
+                                  )
+                              ) AS elem)) AS token_value
+        LEFT JOIN ethereum_1.event_delayedredeemcreated_aa732c edc
+            ON edc.token = token_value
+            AND edc.evt_block_time >= 1732091586
+    GROUP BY edc.token, dr.date
+),
+claimed_data AS (
+    -- Aggregate data from event_delayedredeemsclaimed_aa732c and event_delayedredeemsprincipalclaimed_aa732c tables
+    SELECT
+        edc.token,
+        dr.date,
+        -- Calculate clear_amount
+        COALESCE(SUM(edp."claimedAmount") FILTER (WHERE edp.evt_block_time <= EXTRACT(EPOCH FROM dr.date + INTERVAL '1 day')), 0) +
+        COALESCE(SUM(edc."claimedAmount") FILTER (WHERE edc.evt_block_time <= EXTRACT(EPOCH FROM dr.date + INTERVAL '1 day')), 0) AS clear_amount
+    FROM
+        date_ranges dr
+        CROSS JOIN unnest(ARRAY(
+                              SELECT trim(both '"' FROM elem)
+                              FROM unnest(
+                                  string_to_array(
+                                      REPLACE(REPLACE('@token', '[', ''), ']', ''),
+                                      ', '
+                                  )
+                              ) AS elem)) AS token_value
+        LEFT JOIN ethereum_1.event_delayedredeemsclaimed_aa732c edc
+            ON edc.token = token_value
+            AND edc.evt_block_time >= 1732091586
+        LEFT JOIN ethereum_1.event_delayedredeemsprincipalclaimed_aa732c edp
+            ON edp.token = token_value
+            AND edp.evt_block_time >= 1732091586
+    GROUP BY edc.token, dr.date
+),
+aggregated_data AS (
+    -- Merge the created_data and claimed_data results
+    SELECT
+        cd.token,
+        cd.date,
+        cd.total_debt,
+        COALESCE(cl.clear_amount, 0) AS clear_amount
+    FROM
+        created_data cd
+        LEFT JOIN claimed_data cl
+            ON cd.token = cl.token
+            AND cd.date = cl.date
+),
+claimable_data AS (
+    -- Calculate claimable_amount
+    SELECT
+        ad.token,
+        ad.date,
+        ad.total_debt,
+        ad.clear_amount,
+        -- Calculate claimable_amount
+        COALESCE(SUM(prev_edc.amount) FILTER (WHERE prev_edc.evt_block_time <= EXTRACT(EPOCH FROM (ad.date - INTERVAL '7 days'))), 0)
+        - ad.clear_amount AS claimable_amount
+    FROM
+        aggregated_data ad
+        LEFT JOIN ethereum_1.event_delayedredeemcreated_aa732c prev_edc
+            ON prev_edc.token = ad.token
+            AND prev_edc.evt_block_time >= 1732091586
+    GROUP BY ad.token, ad.date, ad.total_debt, ad.clear_amount
+)
+SELECT
+    token,
+    date,
+    total_debt,
+    clear_amount,
+    claimable_amount
+FROM
+    claimable_data
+ORDER BY
+    token, date;
+"""
+
+params = """
+{
+    "token": ["0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599", "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf"]
+}
+"""
+
+[FuncGetCreateEventRedeemEthereum]
+dsn = "rune_dns_pro"
+cmd = """
+WITH filtered_data AS (
+    SELECT
+        evt_block_time,
+        recipient,
+        token,
+        amount,
+        "redeemFee"
+    FROM
+        ethereum_1.event_delayedredeemcreated_aa732c
+    WHERE
+        evt_block_time >= @start_time
+        AND evt_block_time < @end_time
+        AND ('@user' = '' OR recipient = '@user')
+),
+total_count AS (
+    SELECT COUNT(*) AS count FROM filtered_data
+),
+paginated_data AS (
+    SELECT
+        evt_block_time,
+        recipient,
+        token,
+        amount,
+        "redeemFee"
+    FROM
+        filtered_data
+    ORDER BY
+        evt_block_time DESC
+    LIMIT @limit
+    OFFSET @offset
+)
+SELECT json_build_object(
+    'limit', @limit,
+	'offset',@offset,
+    'total', (SELECT count FROM total_count),
+    'data', json_agg(
+        json_build_object(
+            'evt_block_time', evt_block_time,
+            'recipient', recipient,
+            'token', token,
+            'amount', amount,
+            'redeemFee', "redeemFee"
+        )
+    )
+) AS result
+FROM paginated_data;
+"""
+params = """
+{
+    "user": "0x5D2211cc8b0913efC4807d1AECfc4EAa4703a05c",
+    "start_time": 1737300894,
+    "end_time": 1737340894,
+    "limit": 10,
+    "offset": 10
+}
+"""
+
+[FuncGetClaimEventRedeemEthereum]
+dsn = "rune_dns_pro"
+cmd = """
+WITH combined_data AS (
+    SELECT
+        evt_block_time,
+        recipient,
+        token,
+        "claimedAmount"
+    FROM
+        ethereum_1.event_delayedredeemsclaimed_aa732c
+    WHERE
+        evt_block_time >= @start_time
+        AND evt_block_time < @end_time
+        AND ('@user' = '' OR recipient = '@user')
+    UNION ALL
+
+    SELECT
+        evt_block_time,
+        recipient,
+        token,
+        "claimedAmount"
+    FROM
+        ethereum_1.event_delayedredeemsprincipalclaimed_aa732c
+    WHERE
+        evt_block_time >= @start_time
+        AND evt_block_time < @end_time
+        AND ('@user' = '' OR recipient = '@user')
+),
+total_count AS (
+    SELECT COUNT(*) AS count FROM combined_data
+),
+paginated_data AS (
+    SELECT
+        evt_block_time,
+        recipient,
+        token,
+        "claimedAmount"
+    FROM
+        combined_data
+    ORDER BY
+        evt_block_time DESC
+    LIMIT @limit
+    OFFSET @offset
+)
+SELECT json_build_object(
+    'limit', @limit,
+	'offset',@offset,
+    'total', (SELECT count FROM total_count),
+    'data', json_agg(
+        json_build_object(
+            'evt_block_time', evt_block_time,
+            'recipient', recipient,
+            'token', token,
+            'claimedAmount', "claimedAmount"
+        )
+    )
+) AS result
+FROM paginated_data;
+"""
+params = """
+{
+    "user": "0x5D2211cc8b0913efC4807d1AECfc4EAa4703a05c",
+    "start_time": 1737300894,
+    "end_time": 1737340894,
+    "limit": 10,
+    "offset": 10
+}
+"""

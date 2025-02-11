@@ -1,0 +1,110 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is webapp server api.",
+        "title": "Web Server API",
+        "contact": {
+            "name": "API Support",
+            "url": "http://www.swagger.io/support",
+            "email": "hanson@bedrock.technology"
+        },
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "version": "1.0"
+    },
+    "paths": {
+        "/dsn/exec/{func_name}/{params}": {
+            "get": {
+                "description": "Execute a sql command with the given parameters",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dsn Hun Client"
+                ],
+                "summary": "Execute a sql command",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Function Name",
+                        "name": "func_name",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "object",
+                        "description": "Function Parameters (as a map)",
+                        "name": "params",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed operation",
+                        "schema": {
+                            "$ref": "#/definitions/proto.ResponseMsg"
+                        }
+                    }
+                }
+            }
+        },
+        "/dsn/func_list": {
+            "get": {
+                "description": "Retrieve the list of functions that can be executed",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Dsn Hun Client"
+                ],
+                "summary": "Get func list for dsn hub client",
+                "responses": {
+                    "200": {
+                        "description": "Successful operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Failed operation",
+                        "schema": {
+                            "$ref": "#/definitions/proto.ResponseMsg"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "proto.ResponseMsg": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

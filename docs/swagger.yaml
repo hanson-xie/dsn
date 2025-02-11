@@ -1,0 +1,73 @@
+definitions:
+  proto.ResponseMsg:
+    properties:
+      error:
+        type: string
+    type: object
+info:
+  contact:
+    email: hanson@bedrock.technology
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is webapp server api.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: Web Server API
+  version: "1.0"
+paths:
+  /dsn/exec/{func_name}/{params}:
+    get:
+      consumes:
+      - application/json
+      description: Execute a sql command with the given parameters
+      parameters:
+      - description: Function Name
+        in: path
+        name: func_name
+        required: true
+        type: string
+      - description: Function Parameters (as a map)
+        in: path
+        name: params
+        required: true
+        type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "400":
+          description: Failed operation
+          schema:
+            $ref: '#/definitions/proto.ResponseMsg'
+      summary: Execute a sql command
+      tags:
+      - Dsn Hun Client
+  /dsn/func_list:
+    get:
+      description: Retrieve the list of functions that can be executed
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful operation
+          schema:
+            items:
+              additionalProperties:
+                type: string
+              type: object
+            type: array
+        "400":
+          description: Failed operation
+          schema:
+            $ref: '#/definitions/proto.ResponseMsg'
+      summary: Get func list for dsn hub client
+      tags:
+      - Dsn Hun Client
+swagger: "2.0"
