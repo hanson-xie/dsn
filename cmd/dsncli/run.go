@@ -31,7 +31,7 @@ import (
 
 var RunCmd = &cobra.Command{
 	Use:   "run",
-	Short: "Start a dns process",
+	Short: "Start a dsn process",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		conf := dsn.GetConfig()
 		e := gin.Default()
@@ -70,7 +70,7 @@ var RunCmd = &cobra.Command{
 		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
 		defer cancel()
 		if err := srv.Shutdown(ctx); err != nil {
-			log.Errorf("dns", "Server Shutdown:", err)
+			log.Errorf("dsn", "Server Shutdown:", err)
 		}
 		log.Info("Server exiting")
 		return nil

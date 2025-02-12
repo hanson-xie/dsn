@@ -1,5 +1,5 @@
 [FuncGetDebtDurationRedeemEthereum]
-dsn = "rune_dns_pro"
+dsn = "rune_dsn_pro"
 cmd = """
 SELECT
     SUM(amount) AS total_amount
@@ -20,7 +20,7 @@ params = """
 """
 
 [FuncGetRecent8DaysInfoRedeemEthereum]
-dsn = "rune_dns_pro"
+dsn = "rune_dsn_pro"
 cmd = """
 WITH date_ranges AS (
     -- Generate 17 days of date ranges, from 8 days before now to 8 days after now
@@ -128,7 +128,7 @@ params = """
 """
 
 [FuncGetCreateEventRedeemEthereum]
-dsn = "rune_dns_pro"
+dsn = "rune_dsn_pro"
 cmd = """
 WITH filtered_data AS (
     SELECT
@@ -188,7 +188,7 @@ params = """
 """
 
 [FuncGetClaimEventRedeemEthereum]
-dsn = "rune_dns_pro"
+dsn = "rune_dsn_pro"
 cmd = """
 WITH combined_data AS (
     SELECT

@@ -1,4 +1,4 @@
-#dns app config
+#dsn app config
 log:
   level: 0
   log_dir: "/tmp/log"
@@ -9,13 +9,13 @@ log:
 
 rpc: ":8570"
 
-#dns config
-dns_servers:
-    rune_dns_pro: ""
-    rune_dns_dev: ""
+#dsn config
+dsn_servers:
+    rune_dsn_pro: ""
+    rune_dsn_dev: ""
 
 doc_auth:
-  dns_center: "bedrock"
+  dsn_center: "bedrock"
 
 toml_dir: "./toml"
 git_update_shell: "./exec/git_update.sh"

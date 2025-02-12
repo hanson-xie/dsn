@@ -20,6 +20,6 @@ var SqlCmd = &cobra.Command{
 }
 
 func init() {
-	SqlCmd.Flags().String("rpc", "http://127.0.0.1:1234/dns/load", "local rpc server address")
+	SqlCmd.Flags().String("rpc", "http://127.0.0.1:1234/dsn/load", "local rpc server address")
 	SqlCmd.Flags().String("toml-file", "sql.toml", "add the sql config file to the dsn app")
 }
