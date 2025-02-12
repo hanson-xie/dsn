@@ -1,5 +1,5 @@
 [FUNGetBtcTokenInfoCCIP]
-dsn = "rune_dns_pro"
+dsn = "rune_dsn_pro"
 cmd = """
 WITH minted_data AS (
     SELECT

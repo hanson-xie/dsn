@@ -3,7 +3,7 @@ package config
 type DsnConfig struct {
 	Log            LogConfig         `yaml:"log"`
 	Rpc            string            `yaml:"rpc"`
-	DnsServers     map[string]string `yaml:"dns_servers"`
+	DsnServers     map[string]string `yaml:"dsn_servers"`
 	DocAuth        map[string]string `yaml:"doc_auth"`
 	TomlDir        string            `yaml:"toml_dir"`
 	GitUpdateShell string            `yaml:"git_update_shell"`

@@ -10,7 +10,7 @@ import (
 var dbInstances = make(map[string]*gorm.DB)
 
 func GetDBConnection(wrapdsn string) (*gorm.DB, error) {
-	dsn, ok := dsn.GetConfig().DnsServers[wrapdsn]
+	dsn, ok := dsn.GetConfig().DsnServers[wrapdsn]
 	if !ok {
 		return nil, fmt.Errorf("dsn not found")
 	}

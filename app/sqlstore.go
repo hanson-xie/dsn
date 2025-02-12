@@ -315,10 +315,10 @@ func (cs *ConfigStore) reloadSqlConfig() {
 
 func (cs *ConfigStore) start(stopCh <-chan struct{}) {
 	cs.Cron.Start()
-	log.Info("dns sql center is working")
+	log.Info("dsn sql center is working")
 	select {
 	case <-stopCh:
-		log.Warn("BedRock dns sql received shutdown")
+		log.Warn("BedRock dsn sql received shutdown")
 		contextStop := cs.Cron.Stop()
 		select {
 		case <-contextStop.Done():
