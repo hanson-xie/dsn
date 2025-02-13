@@ -207,3 +207,123 @@ params = """
     "end_time": 1737340894
 }
 """
+[FUNGetUserMintedUniBtcAmountCHAIN]
+dsn = "rune_dsn_pro"
+cmd = """
+SELECT
+    '@user' as user,
+    '@chain_name' as chain_name,
+    SUM(amount) as total_amount,
+    COUNT(*) as transaction_count
+FROM (
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM ethereum_1.event_minted_047d41
+    WHERE '@chain_name' = 'ethereum'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM optimism_10.event_minted_f97750
+    WHERE '@chain_name' = 'optimism'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bsc_56.event_minted_84e5c8
+    WHERE '@chain_name' = 'bsc'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM mantle_5000.event_minted_f97750
+    WHERE '@chain_name' = 'mantle'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM mode_34443.event_minted_84e5c8
+    WHERE '@chain_name' = 'mode'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM arbitrum_42161.event_minted_84e5c8
+    WHERE '@chain_name' = 'arbitrum'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM b2_223.event_minted_f97750
+    WHERE '@chain_name' = 'b2'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bera_80094.event_minted_e0240d
+    WHERE '@chain_name' = 'bera'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bitlayer_200901.event_minted_f97750
+    WHERE '@chain_name' = 'bitlayer'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bob_60808.event_minted_2ac98d
+    WHERE '@chain_name' = 'bob'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM merlin_4200.event_minted_f97750
+    WHERE '@chain_name' = 'merlin'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM zeta_7000.event_minted_84e5c8
+    WHERE '@chain_name' = 'zeta'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+) AS combined_data;
+"""
+params = """
+{
+    "user": "0x5D2211cc8b0913efC4807d1AECfc4EAa4703a05c",
+    "start_time": 1737300894,
+    "end_time": 1737340894,
+    "chain_name": "ethereum"
+}
+"""
+[FUNGetUserMintedBrBtcAmountCHAIN]
+dsn = "rune_dsn_pro"
+cmd = """
+SELECT
+    '@user' as user,
+    '@chain_name' as chain_name,
+    SUM(amount) as total_amount,
+    COUNT(*) as transaction_count
+FROM (
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM ethereum_1.event_minted_1419b4
+    WHERE '@chain_name' = 'ethereum'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bsc_56.event_minted_1df46e
+    WHERE '@chain_name' = 'bsc'
+        AND evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+) AS combined_data;
+"""
+params = """
+{
+    "user": "0x5D2211cc8b0913efC4807d1AECfc4EAa4703a05c",
+    "start_time": 1737300894,
+    "end_time": 1737340894,
+    "chain_name": "ethereum"
+}
+"""
