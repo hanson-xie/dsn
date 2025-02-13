@@ -77,4 +77,133 @@ ON
 ORDER BY
     chain_name;
 """
+[FUNGetUserMintedUniBtcAmountALLCHAIN]
+dsn = "rune_dsn_pro"
+cmd = """
+WITH combined_data AS (
+    -- ethereum chain
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM ethereum_1.event_minted_047d41
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
 
+    -- optimism chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM optimism_10.event_minted_f97750
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- bsc chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bsc_56.event_minted_84e5c8
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- mantle chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM mantle_5000.event_minted_f97750
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- mode chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM mode_34443.event_minted_84e5c8
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- arbitrum chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM arbitrum_42161.event_minted_84e5c8
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- B2 chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM b2_223.event_minted_f97750
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- Bera chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bera_80094.event_minted_e0240d
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- Bitlayer chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bitlayer_200901.event_minted_f97750
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- BOB chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bob_60808.event_minted_2ac98d
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- Merlin chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM merlin_4200.event_minted_f97750
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- Zeta chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM zeta_7000.event_minted_84e5c8
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+)
+SELECT
+    '@user' as user,
+    SUM(amount) as total_amount,
+    COUNT(*) as transaction_count
+FROM combined_data;
+"""
+params = """
+{
+    "user": "0x5D2211cc8b0913efC4807d1AECfc4EAa4703a05c",
+    "start_time": 1737300894,
+    "end_time": 1737340894
+}
+"""
+[FUNGetUserMintedBrBtcAmountALLCHAIN]
+dsn = "rune_dsn_pro"
+cmd = """
+WITH combined_data AS (
+    -- ethereum chain
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM ethereum_1.event_minted_1419b4
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+
+    -- bsc chain
+    UNION ALL
+    SELECT evt_block_time, evt_tx_sender, amount
+    FROM bsc_56.event_minted_1df46e
+    WHERE evt_block_time BETWEEN @start_time AND @end_time
+        AND LOWER(evt_tx_sender) = LOWER('@user')
+)
+SELECT
+    '@user' as user,
+    SUM(amount) as total_amount,
+    COUNT(*) as transaction_count
+FROM combined_data;
+"""
+params = """
+{
+    "user": "0x5D2211cc8b0913efC4807d1AECfc4EAa4703a05c",
+    "start_time": 1737300894,
+    "end_time": 1737340894
+}
+"""
