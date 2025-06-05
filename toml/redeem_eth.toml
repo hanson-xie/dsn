@@ -45,7 +45,7 @@ created_data AS (
                               FROM unnest(
                                   string_to_array(
                                       REPLACE(REPLACE('@token', '[', ''), ']', ''),
-                                      ', '
+                                      ','
                                   )
                               ) AS elem)) AS token_value
         LEFT JOIN ethereum_1.event_delayedredeemcreated_aa732c edc
@@ -68,7 +68,7 @@ claimed_data AS (
                               FROM unnest(
                                   string_to_array(
                                       REPLACE(REPLACE('@token', '[', ''), ']', ''),
-                                      ', '
+                                      ','
                                   )
                               ) AS elem)) AS token_value
         LEFT JOIN ethereum_1.event_delayedredeemsclaimed_aa732c edc
